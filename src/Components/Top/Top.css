@@ -1,0 +1,21 @@
+.Top {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0.8rem;
+}
+
+.Top-form-field {
+    display: flex;
+    width: 50vw;
+    justify-content: center;
+}
+
+.Top-form-field>input {
+    width: 75%;
+}
+
+.Top-form-field button {
+    font-weight: 500;
+}

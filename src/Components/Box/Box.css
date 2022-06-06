@@ -1,0 +1,12 @@
+.Box {
+    background-position: center;
+    background-size: cover;
+    height: 40vh;
+    border-radius: 6px;
+    box-shadow: 1px 1px 6px 1px #000;
+    transition: all 200ms ease-in;
+}
+
+.Box:hover {
+    transform: scale(1.02);
+}
