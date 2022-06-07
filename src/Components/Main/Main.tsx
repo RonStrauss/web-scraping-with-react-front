@@ -7,7 +7,7 @@ type Props = {
     count:number;
     setCount:Dispatch<SetStateAction<number>>
     links:ScrappedContent[];
-    fetchThisUrl:(url:string)=>Promise<void>
+    fetchThisUrl:(url?:string)=>Promise<void>
   }
 
 export const Main = (props:Props) => {

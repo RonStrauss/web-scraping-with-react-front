@@ -10,9 +10,9 @@ function App() {
   const [links, setLinks] = useState<ScrappedContent[]>([])
 
   const fetchThisUrl = async (inputtedUrl?:string) =>{
-    //typescript doesn't allow both optional and default arguements in function declaration
+    //typescript doesn't allow both optional and default arguments in function declaration
     if (!inputtedUrl)inputtedUrl = url
-    const res = await fetch(`http://localhost:1000/scrape?url=${inputtedUrl}${count > 1 ? "&page="+count : ''}`)
+    const res = await fetch(`http://localhost:1000/scrape-page?url=${inputtedUrl}${count > 1 ? "&page="+count : ''}`)
     const data = await res.json()
     if (!data.err){
       setCount(count+1)

@@ -6,7 +6,7 @@ const app = express();
 
 app.use(require('cors')());
 
-app.get('/scrape', async (req, res) => {
+app.get('/scrape-page', async (req, res) => {
 	try {
 		const data = await getContent(req.query.url, req.query.page);
 		res.send(data);
