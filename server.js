@@ -11,14 +11,15 @@ app.get('/scrape-page', async (req, res) => {
 		const data = await getContent(req.query.url, req.query.page);
 		res.send(data);
 	} catch (error) {
-        console.log(error)
+		console.log(error);
 		res.status(500).send({ msg: 'Something went wrong!', err: error });
 	}
 });
 
-async function getContent(url,page) {
+async function getContent(url, page) {
 	const endResponse = [];
 	try {
+		url = url[-1] == '/' ? url.slice(0, url.length - 2) : url;
 		const res = await axios.get(page ? `${url}/page/${page}` : url);
 		const $ = cheerio.load(res.data);
 		$('article').each((i, data) => {
@@ -53,7 +54,7 @@ async function getContent(url,page) {
 		// }
 		return endResponse;
 	} catch (err) {
-        console.log(err)
+		console.log(err);
 		throw Error(err);
 	}
 }
