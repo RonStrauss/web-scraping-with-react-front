@@ -4,3 +4,9 @@
     padding: 1rem;
     gap: 0.4rem;
 }
+
+@media screen and (max-width:800px) {
+    .Main {
+        grid-template-columns: 1fr;
+    }
+}

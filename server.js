@@ -8,7 +8,7 @@ app.use(require('cors')());
 
 app.get('/scrape', async (req, res) => {
 	try {
-		const data = await getTitles(req.query.url);
+		const data = await getContent(req.query.url, req.query.page);
 		res.send(data);
 	} catch (error) {
         console.log(error)
@@ -16,14 +16,14 @@ app.get('/scrape', async (req, res) => {
 	}
 });
 
-async function getTitles(url) {
+async function getContent(url,page) {
 	const endResponse = [];
 	try {
-		const res = await axios.get(url);
+		const res = await axios.get(page ? `${url}/page/${page}` : url);
 		const $ = cheerio.load(res.data);
 		$('article').each((i, data) => {
-			//skip if first article
-			if (!i) {
+			//skip if first article in first page
+			if (!i && !page) {
 			} else {
 				endResponse.push({
 					title: $(data.children[1].childNodes[3]).text(),

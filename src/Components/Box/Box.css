@@ -1,12 +1,34 @@
+.Box-wrapper{
+text-decoration: none;
+color: #000;
+}
+
 .Box {
     background-position: center;
     background-size: cover;
-    height: 40vh;
+    background-repeat: no-repeat;
+    height: 45vh;
     border-radius: 6px;
     box-shadow: 1px 1px 6px 1px #000;
     transition: all 200ms ease-in;
+    text-align: center;
+    padding: 0.5rem;
 }
 
 .Box:hover {
     transform: scale(1.02);
+}
+
+.Box-title {
+    box-shadow: inset 0 0 10px 9px #fff;
+    padding: 0.1rem;
+    transition: all 200ms ease;
+}
+
+.Box:hover .Box-title {
+    opacity: 0;
+}
+
+.Box:hover .Box-title:hover {
+    opacity: 1;
 }

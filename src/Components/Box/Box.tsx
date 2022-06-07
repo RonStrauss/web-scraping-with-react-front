@@ -5,7 +5,8 @@ type Props = ScrappedContent
 
 const Box = (props: Props) => {
   return (
-    <div className='Box' style={{backgroundImage:`url(${props.img})`}}></div>
+    <a href={props.link} className="Box-wrapper" target="_blank"><div className='Box' style={{backgroundImage:`url(${props.img})`}}><span className="Box-title" onClick={()=>{return false}}>{props.title}</span></div>
+      </a>
   )
 }
 

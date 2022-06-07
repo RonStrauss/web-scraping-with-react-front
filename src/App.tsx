@@ -9,19 +9,22 @@ function App() {
   const [url, setUrl] = useState("")
   const [links, setLinks] = useState<ScrappedContent[]>([])
 
-  useEffect(() => {
-    
-  
-    return () => {
-      
+  const fetchThisUrl = async (inputtedUrl:string=url) =>{
+    const res = await fetch(`http://localhost:1000/scrape?url=${inputtedUrl}${count > 1 ? "&page="+count : ''}`)
+    const data = await res.json()
+    if (!data.err){
+      setCount(count+1)
+        setLinks([...links,...data])
+    } else {
+      alert(data.msg+"\n"+data.err)
     }
-  }, [])
+  }
   
 
   return (
     <div className="App">
-     <Top {...{url,count,setUrl,setCount,setLinks}}/>
-     <Main {...{url,count,setUrl,setCount,links}}/>
+     <Top {...{url,setUrl,fetchThisUrl}}/>
+     <Main {...{count,links,fetchThisUrl,setCount}}/>
     </div>
   )
 }
