@@ -1,14 +1,16 @@
-const cheerio = require('cheerio');
+const { load } = require('cheerio');
 const express = require('express');
 const axios = require('axios');
 
 const app = express();
 
+const fs = require('fs/promises');
+
 app.use(require('cors')());
 
 app.get('/scrape-page', async (req, res) => {
 	try {
-		const data = await getContent(req.query.url, req.query.page);
+		const data = await getPage(req.query.url, req.query.page);
 		res.send(data);
 	} catch (error) {
 		console.log(error);
@@ -16,48 +18,26 @@ app.get('/scrape-page', async (req, res) => {
 	}
 });
 
-async function getContent(url, page) {
-	const endResponse = [];
+app.get('/scrape-single', async (req, res) => {
 	try {
-		url = url[-1] == '/' ? url.slice(0, url.length - 2) : url;
-		const res = await axios.get(page ? `${url}/page/${page}` : url);
-		const $ = cheerio.load(res.data);
-		$('article').each((i, data) => {
-			//skip if first article in first page
-			if (!i && !page) {
-			} else {
-				endResponse.push({
-					title: $(data.children[1].childNodes[3]).text(),
-					link: data.children[1].childNodes[3].children[0].attribs.href,
-					img: data.children[4].children[1].children[0].attribs.src,
-				});
-			}
-		});
-		// for (const [i, e] of new Array(50).entries()) {
-		// 	await request('https://newshemalesvideos.com/page/' + (i + 2), (err, res, html) => {
-		// 		if (!err && res.statusCode == 200) {
-		// 			const $ = cheerio.load(html);
-		// 			$('article').each((i, data) => {
-		// 				//skip if first article
-		// 				if (!i) {
-		// 				} else {
-		// 					endResponse += `<div style="display: flex;flex-direction: column;align-items: center;"><h2><a target="_blank" href=${
-		// 						data.children[1].childNodes[3].children[0].attribs.href
-		// 					}>${$(data.children[1].childNodes[3]).text()}</a></h2><a target="_blank" href=${
-		// 						data.children[1].childNodes[3].children[0].attribs.href
-		// 					}><img src=${data.children[4].children[1].children[0].attribs.src}></a></div>`;
-		// 				}
-		// 			});
-		// 		} else {
-		// 		}
-		// 	});
-		// }
-		return endResponse;
+		const data = await getSingle(req.query.url);
+		res.send(data);
 	} catch (err) {
 		console.log(err);
-		throw Error(err);
+		res.status(500).send({ msg: 'Something went wrong!', err });
 	}
-}
+});
+
+app.get('/test', async (req, res) => {
+	try {
+		const axiosRes = await axios.get(req.query.url);
+		await fs.writeFile('html-sample.html', axiosRes.data);
+		res.send('All Done!');
+	} catch (err) {
+		console.log(err);
+		res.status(500).send({ msg: 'Something went wrong!', err });
+	}
+});
 
 // app.get('/video', async (req, res) => {
 // 	let endResponse = '';
@@ -83,3 +63,60 @@ async function getContent(url, page) {
 app.listen(1000, () => {
 	console.log('runnin 1000\nhttp://localhost:1000');
 });
+
+const searchInString = (string, key) => string.search(key);
+
+async function getPage(url, page) {
+	const endResponse = [];
+	try {
+		url = url[-1] == '/' ? url.slice(0, url.length - 2) : url;
+		const res = await axios.get(page ? `${url}/page/${page}` : url);
+		const $ = load(res.data);
+		$('article').each((i, data) => {
+			//skip if first article in first page
+			if (!i && !page) {
+			} else {
+				endResponse.push({
+					title: $(data.children[1].childNodes[3]).text(),
+					link: data.children[1].childNodes[3].children[0].attribs.href,
+					img: data.children[4].children[1].children[0].attribs.src,
+				});
+			}
+		});
+		return endResponse;
+	} catch (err) {
+		console.log(err);
+		throw Error(err);
+	}
+}
+
+async function getSingle(url) {
+	try {
+		const endResponse = {};
+		const { data } = await axios.get(url);
+		const searchStreamtape = searchInString(data, `https://streamtape.com/v/`);
+		const searchVidoza = searchInString(data, `https://vidoza.net/`);
+		if (searchStreamtape > -1) {
+			const link = data.slice(searchStreamtape, searchStreamtape + 40);
+			const streamtapeRes = await axios.get(link);
+			const $ = load(streamtapeRes.data);
+			endResponse.streamtape = { img: $('#mainvideo').attr().poster, url: link };
+		}
+		if (searchVidoza > -1) {
+			const link = data.slice(searchVidoza, searchVidoza + 36);
+			const searchVidozaRes = await axios.get(link);
+			const $ = load(searchVidozaRes.data);
+			endResponse.vidoza = { video: $('#player>source').attr('src') };
+			const searchPoster = searchInString(searchVidozaRes.data, 'poster:');
+			if (searchPoster > -1) {
+				const narrowSearchPosterString = searchVidozaRes.data.slice(searchPoster, searchPoster + 200);
+				const searchPosterJpg = searchInString(narrowSearchPosterString, 'jpg');
+				console.log(searchPosterJpg);
+				endResponse.vidoza.poster = narrowSearchPosterString.slice(9, searchPosterJpg + 3);
+			}
+		}
+		return Object.keys(endResponse).length ? endResponse : { msg: 'Nothing to fetch, sorry!' };
+	} catch (err) {
+		throw 'Something failed, sorry!\n' + err;
+	}
+}

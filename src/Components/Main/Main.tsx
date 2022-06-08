@@ -1,16 +1,22 @@
 import { Dispatch, SetStateAction, useEffect, useRef } from 'react'
-import { ScrappedContent } from '../../Types/ScrappedContent'
+import ModalContent from '../../Types/ModalContent'
+import ScrappedContent  from '../../Types/ScrappedContent'
 import Box  from '../Box/Box'
 import "./Main.css"
 
 type Props = {
     count:number;
     setCount:Dispatch<SetStateAction<number>>
+    setModalContent:Dispatch<SetStateAction<ModalContent>>
+    setIsModalOpen:Dispatch<SetStateAction<boolean>>
+    setIsLoading:Dispatch<SetStateAction<boolean>>
     links:ScrappedContent[];
     fetchThisUrl:(url?:string)=>Promise<void>
   }
 
 export const Main = (props:Props) => {
+
+  const {setModalContent,setIsModalOpen,setIsLoading} = props
 
   const containerRef = useRef(null)
   
@@ -28,6 +34,6 @@ export const Main = (props:Props) => {
   }, [containerRef,props.count])
   
   return (
-    <div className='Main'>{props.links.map((each:ScrappedContent) => <Box {...each}/>)}<span id="observer" ref={containerRef}></span></div>
+    <div className='Main'>{props.links.map((each:ScrappedContent) => <Box {...{...each,setModalContent,setIsModalOpen,setIsLoading}}/>)}<span id="observer" ref={containerRef}></span></div>
   )
 }
