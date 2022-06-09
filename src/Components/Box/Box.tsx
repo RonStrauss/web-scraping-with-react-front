@@ -9,18 +9,18 @@ interface Props extends ScrappedContent {
   setIsLoading: Dispatch<SetStateAction<boolean>>
 };
 
-const Box = (props: Props) => {
+const Box = ({link,title,img,setIsLoading,setIsModalOpen,setModalContent}: Props) => {
 
   const fetchRelatedLinks = async (url: string) => {
-    props.setIsLoading(true)
+    setIsLoading(true)
     const res = await fetch(`http://localhost:1000/scrape-single?url=${url}`)
     const data = await res.json()
     if (!data.err) {
-      props.setIsModalOpen(true)
-      props.setModalContent({...data,pageContent:{title:props.title,img:props.img,link:props.link}})
-      props.setIsLoading(false)
+      setIsModalOpen(true)
+      setModalContent({...data,pageContent:{title,img,link}})
+      setIsLoading(false)
     } else {
-      props.setIsLoading(false)
+      setIsLoading(false)
       alert(data.err + "\n" + data.msg)
     }
   }
@@ -29,10 +29,10 @@ const Box = (props: Props) => {
     <div
       className='Box'
       onClick={e => {
-        if (e.target instanceof HTMLDivElement) { props.setIsModalOpen(true) }
+        if (e.target instanceof HTMLDivElement) { fetchRelatedLinks(link) }
       }}
-      style={{ backgroundImage: `url(${props.img})` }}>
-      <span className='Box-title'>{props.title}</span>
+      style={{ backgroundImage: `url(${img})` }}>
+      <span className='Box-title'>{title}</span>
     </div>
   );
 };

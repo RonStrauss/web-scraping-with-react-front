@@ -15,7 +15,6 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [modalContent, setModalContent] = useState<ModalContent>({})
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [scrollY, setScrollY] = useState("0")
 
 
   const fetchThisUrl = async (inputtedUrl?: string) => {
@@ -40,17 +39,16 @@ function App() {
   }
 
   useEffect(() => {
-    if (window.scrollY > 0) setScrollY(String(window.scrollY))
-    // const scrollY = String(window.scrollY)
-    console.log(scrollY)
     if (isModalOpen) {
-      document.body.style.position = "fixed"
+      const scrollY = String(window.scrollY)
+      document.body.classList.add('modal-open')
       document.body.style.top = `-${scrollY}px`
       window.scrollTo(0, parseInt(scrollY || "0") * 1)
     } else {
-      document.body.style.position = '';
+      const scrollY = String(document.body.style.top)
+      document.body.classList.remove('modal-open')
       document.body.style.top = '';
-      window.scrollTo(0, parseInt(scrollY || "0") * 1)
+      window.scrollTo(0, parseInt(scrollY || "0") * -1)
     }
   }, [isModalOpen])
 
@@ -60,7 +58,7 @@ function App() {
 
   return (
     <div className="App">
-      <Top {...{ url, setUrl, fetchThisUrl }} />
+      <Top {...{ url, setUrl, fetchThisUrl,count, setCount }} />
       <Main {...{ count, links, fetchThisUrl, setCount, setModalContent, setIsModalOpen, setIsLoading }} />
       {isLoading ? <Loading /> : null}
       {isModalOpen ? <Modal {...{ ...{ modalContent }, setIsModalOpen }} /> : null}

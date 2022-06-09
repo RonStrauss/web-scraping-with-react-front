@@ -14,15 +14,14 @@ type Props = {
     fetchThisUrl:(url?:string)=>Promise<void>
   }
 
-export const Main = (props:Props) => {
+export const Main = ({count,setCount,setModalContent,setIsModalOpen,setIsLoading,links,fetchThisUrl}:Props) => {
 
-  const {setModalContent,setIsModalOpen,setIsLoading} = props
 
   const containerRef = useRef(null)
   
   useEffect(() => {
     const observer = new IntersectionObserver((arr)=>{
-      if (arr[0].isIntersecting && props.count>1){props.fetchThisUrl()}
+      if (arr[0].isIntersecting && count>1){fetchThisUrl()}
     },{threshold:1})
 
     if (containerRef.current) observer.observe(containerRef.current)
@@ -31,9 +30,9 @@ export const Main = (props:Props) => {
     return () => {
       if (containerRef.current) observer.unobserve(containerRef.current)
     }
-  }, [containerRef,props.count])
+  }, [containerRef,count])
   
   return (
-    <div className='Main'>{props.links.map((each:ScrappedContent) => <Box {...{...each,setModalContent,setIsModalOpen,setIsLoading}}/>)}<span id="observer" ref={containerRef}></span></div>
+    <div className='Main'>{links.map((each:ScrappedContent) => <Box {...{...each,setModalContent,setIsModalOpen,setIsLoading}}/>)}<span id="observer" ref={containerRef}></span></div>
   )
 }
