@@ -93,17 +93,19 @@ async function getPage(url, page) {
 async function getSingle(url) {
 	try {
 		const endResponse = {};
-		const { data } = await axios.get(url);
-		const searchStreamtape = searchInString(data, `https://streamtape.com/v/`);
-		const searchVidoza = searchInString(data, `https://vidoza.net/`);
+		const res = await axios.get(url);
+		const searchStreamtape = searchInString(res.data, `https://streamtape.com/v/`);
+		const searchVidoza = searchInString(res.data, `https://vidoza.net/`);
 		if (searchStreamtape > -1) {
-			const link = data.slice(searchStreamtape, searchStreamtape + 40);
+			const narrowSearchLinkString = res.data.slice(searchStreamtape, searchStreamtape + 70);
+			const searchLinkLength = searchInString(narrowSearchLinkString, "'");
+			const link = res.data.slice(searchStreamtape, searchStreamtape + searchLinkLength);
 			const streamtapeRes = await axios.get(link);
 			const $ = load(streamtapeRes.data);
 			endResponse.streamtape = { img: $('#mainvideo').attr().poster, url: link };
 		}
 		if (searchVidoza > -1) {
-			const link = data.slice(searchVidoza, searchVidoza + 36);
+			const link = res.data.slice(searchVidoza, searchVidoza + 36);
 			const searchVidozaRes = await axios.get(link);
 			const $ = load(searchVidozaRes.data);
 			endResponse.vidoza = { video: $('#player>source').attr('src') };
@@ -111,11 +113,10 @@ async function getSingle(url) {
 			if (searchPoster > -1) {
 				const narrowSearchPosterString = searchVidozaRes.data.slice(searchPoster, searchPoster + 200);
 				const searchPosterJpg = searchInString(narrowSearchPosterString, 'jpg');
-				console.log(searchPosterJpg);
 				endResponse.vidoza.poster = narrowSearchPosterString.slice(9, searchPosterJpg + 3);
 			}
 		}
-		return Object.keys(endResponse).length ? endResponse : { msg: 'Nothing to fetch, sorry!' };
+		return Object.keys(endResponse).length ? endResponse : { msg: 'Nothing to scrape, sorry!', isFoundAnyLinks: false };
 	} catch (err) {
 		throw 'Something failed, sorry!\n' + err;
 	}
