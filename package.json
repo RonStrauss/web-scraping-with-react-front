@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "scripts": {
-    "dev": "concurrently \"vite\" \"nodemon server.js\"",
+    "dev": "concurrently \"vite\" \"nodemon server.js\" \"start /max chrome http://localhost:3000\"",
     "build": "tsc && vite build",
     "preview": "vite preview"
   },

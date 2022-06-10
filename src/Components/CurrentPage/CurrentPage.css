@@ -1,0 +1,14 @@
+.CurrentPage{
+    display: flex;
+    position: fixed;
+    top:0;
+    justify-content: center;
+    width: 100%;
+    background-color: bisque;
+    transition: all 0.4s ease;
+    z-index: 1;
+}
+
+.CurrentPage-down{
+    top:-50px
+}

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import './App.css'
+import CurrentPage from './Components/CurrentPage/CurrentPage'
 import { Loading } from './Components/Loading/Loading'
 import { Main } from './Components/Main/Main'
 import { Modal } from './Components/Modal/Modal'
@@ -59,6 +60,7 @@ function App() {
   return (
     <div className="App">
       <Top {...{ url, setUrl, fetchThisUrl,count, setCount }} />
+      {count > 1 ? <CurrentPage {...{count}}/> : null}
       <Main {...{ count, links, fetchThisUrl, setCount, setModalContent, setIsModalOpen, setIsLoading }} />
       {isLoading ? <Loading /> : null}
       {isModalOpen ? <Modal {...{ ...{ modalContent }, setIsModalOpen }} /> : null}

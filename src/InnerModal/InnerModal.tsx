@@ -1,13 +1,27 @@
 import { Dispatch, SetStateAction } from 'react'
 import ModalContent from '../Types/ModalContent'
+import FullscreenModalType from '../Types/FullscreenModal'
 import "./InnerModal.css"
 
 type Props = {
   modalContent: ModalContent
   setIsModalOpen: Dispatch<SetStateAction<boolean>>
+  setFullscreenModalSource: Dispatch<SetStateAction<FullscreenModalType|undefined>>
+  setIsFullscreenModalOpen: Dispatch<SetStateAction<boolean>>
 }
 
-const InnerModal = ({ setIsModalOpen, modalContent }: Props) => {
+const InnerModal = ({ setIsModalOpen, modalContent,setFullscreenModalSource,setIsFullscreenModalOpen }: Props) => {
+
+  const openModalWithImage = (element:HTMLImageElement) =>{
+    const {top, left, width, height} = element.getBoundingClientRect()
+    setFullscreenModalSource({img:element.src,
+      width,
+      height,
+      left,
+      top})
+    setIsFullscreenModalOpen(true)
+  }
+
   return (
     <div className="InnerModal">
       <div className="InnerModal-title">
@@ -16,11 +30,11 @@ const InnerModal = ({ setIsModalOpen, modalContent }: Props) => {
       <div className="InnerModal-body">
 
         <div className="InnerModal-left">
-          <a href={modalContent.pageContent?.img} className="InnerModal-left-top" target="_blank" style={{maxHeight: modalContent.streamtape?.img ? "46%":"100%"}}>
-            <img  src={modalContent.pageContent?.img} className={modalContent.vidoza?.poster? "InnerModal-left-top-half-width":""}/>
-            {modalContent.vidoza?<img src={modalContent.vidoza?.poster} className="InnerModal-left-top-half-width"/>:null}
-            </a>
-          {modalContent.streamtape?.img ? <a href={modalContent.streamtape?.img} className="InnerModal-left-bottom" target="_blank"><img  src={modalContent.streamtape?.img}/></a>:null}
+          <div className="InnerModal-left-top" style={{maxHeight: modalContent.streamtape?.img ? "46%":"calc(100% - 1rem)"}}>
+            <img src={modalContent.pageContent?.img} className={modalContent.vidoza?.poster? "InnerModal-left-top-half-width":""} onClick={(e)=>{ if (e.target instanceof HTMLImageElement)openModalWithImage(e.target)}}/>
+            {modalContent.vidoza?<img src={modalContent.vidoza?.poster} onClick={(e)=>{ if (e.target instanceof HTMLImageElement)openModalWithImage(e.target)}} className="InnerModal-left-top-half-width"/>:null}
+            </div>
+          {modalContent.streamtape?.img ? <img className='InnerModal-left-bottom' onClick={(e)=>{ if (e.target instanceof HTMLImageElement)openModalWithImage(e.target)}} src={modalContent.streamtape?.img}/>:null}
 
         </div>
         <div className="InnerModal-right">
