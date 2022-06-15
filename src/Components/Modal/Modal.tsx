@@ -21,6 +21,6 @@ export const Modal = (props: Props) => {
   return (
     <div className='Modal' onClick={(e) => {
       if (e.target instanceof HTMLDivElement && e.target.classList.contains('Modal')) props.setIsModalOpen(false)
-    }}><InnerModal {...transferProps} />{isFullscreenModalOpen ? <FullscreenModal  FullscreenModalOptions={fullscreenModalSource} setIsOpen={setIsFullscreenModalOpen}/>:null}</div>
+    }}><InnerModal {...transferProps} />{isFullscreenModalOpen ? <FullscreenModal  FullscreenModalOptions={fullscreenModalSource} setIsOpen={setIsFullscreenModalOpen} isOpen={isFullscreenModalOpen}/>:null}</div>
   )
 }

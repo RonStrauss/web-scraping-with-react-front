@@ -61,7 +61,7 @@ function App() {
     <div className="App">
       <Top {...{ url, setUrl, fetchThisUrl,count, setCount }} />
       {count > 1 ? <CurrentPage {...{count}}/> : null}
-      <Main {...{ count, links, fetchThisUrl, setCount, setModalContent, setIsModalOpen, setIsLoading }} />
+      <Main {...{ count, links, fetchThisUrl,url, setCount, setModalContent, setIsModalOpen, setIsLoading }} />
       {isLoading ? <Loading /> : null}
       {isModalOpen ? <Modal {...{ ...{ modalContent }, setIsModalOpen }} /> : null}
     </div>

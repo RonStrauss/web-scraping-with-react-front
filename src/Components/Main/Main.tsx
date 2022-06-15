@@ -11,17 +11,22 @@ type Props = {
     setIsModalOpen:Dispatch<SetStateAction<boolean>>
     setIsLoading:Dispatch<SetStateAction<boolean>>
     links:ScrappedContent[];
+    url:string
     fetchThisUrl:(url?:string)=>Promise<void>
   }
 
-export const Main = ({count,setCount,setModalContent,setIsModalOpen,setIsLoading,links,fetchThisUrl}:Props) => {
+export const Main = ({count,url,setCount,setModalContent,setIsModalOpen,setIsLoading,links,fetchThisUrl}:Props) => {
+
+  const triggerSmoothScroll = ()=>{
+    window.scroll({top:window.scrollY+600,behavior:'smooth'})
+  }
 
 
   const containerRef = useRef(null)
   
   useEffect(() => {
     const observer = new IntersectionObserver((arr)=>{
-      if (arr[0].isIntersecting && count>1){fetchThisUrl()}
+      if (arr[0].isIntersecting && count>1 && url){window.scroll(); fetchThisUrl()}
     },{threshold:1})
 
     if (containerRef.current) observer.observe(containerRef.current)
@@ -33,6 +38,6 @@ export const Main = ({count,setCount,setModalContent,setIsModalOpen,setIsLoading
   }, [containerRef,count])
   
   return (
-    <div className='Main'>{links.map((each:ScrappedContent) => <Box {...{...each,setModalContent,setIsModalOpen,setIsLoading}}/>)}<span id="observer" ref={containerRef}></span></div>
+    <div className='Main'><div className="scrollTrigger" onClick={triggerSmoothScroll}>Scroll Area</div>{links.map((each:ScrappedContent) => <Box {...{...each,setModalContent,setIsModalOpen,setIsLoading}}/>)}<span id="observer" ref={containerRef}></span></div>
   )
 }
