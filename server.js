@@ -1,10 +1,15 @@
 const { load } = require('cheerio');
 const express = require('express');
-const axios = require('axios');
+const axios = require('axios').default;
+const path = require('node:path');
+const Listr = require('listr');
+const http = require('node:http');
+const https = require('node:https');
 
 const app = express();
 
-const fs = require('fs/promises');
+const fsP = require('fs/promises');
+const fs = require('fs');
 
 app.use(require('cors')());
 
@@ -28,26 +33,38 @@ app.get('/scrape-single', async (req, res) => {
 	}
 });
 
+app.get('/download-this-link', async (req, res) => {
+	try {
+		if (!req.query.url) return res.send({ err: true, msg: 'No link provided!' });
+		// const data = await downloadFile(req.query.url);
+		const data = await downloadThisVideoStream(req.query.url,req.query.filename);
+		res.send('Downloading :)');
+	} catch (err) {
+		console.log(err);
+		res.status(500).send({ err: true, msg: `Whoops! That shouldn't have happened...` });
+	}
+});
+
+app.get('/scrape-streamtape', async (req, res) => {
+	try {
+		const url = await getStreamtapeLink(req.query.url);
+		res.send({ link: url });
+	} catch (err) {
+		console.log(err);
+		res.status(500).send({ err: true, msg: `Whoops! That shouldn't have happened...` });
+	}
+});
+
 app.get('/test', async (req, res) => {
 	try {
 		const axiosRes = await axios.get(req.query.url);
-		await fs.writeFile('html-sample.html', axiosRes.data);
+		await fsP.writeFile('html-sample.html', axiosRes.data);
 		res.send('All Done!');
 	} catch (err) {
 		console.log(err);
 		res.status(500).send({ msg: 'Something went wrong!', err });
 	}
 });
-
-// app.get('/video', async (req, res) => {
-// 	let endResponse = '';
-// 	await request('https://streamtape.com/v/Al9eYDdWGVC49d', (err, res, html) => {
-// 		if (!err && res.statusCode == 200) {
-// 			const $ = cheerio.load(html);
-// 			$('.plyr-container');
-// 		}
-// 	});
-// });
 
 // app.get('/got-test', async (req, res) => {
 // 	const url =
@@ -61,11 +78,95 @@ app.get('/test', async (req, res) => {
 // async function getVideo() {}
 
 app.listen(1000, () => {
-	console.log('runnin 1000\nhttp://localhost:1000');
+	console.log('running 1000\nhttp://localhost:1000');
 });
 
 const searchInString = (string, key) => string.search(key);
 
+async function downloadFile(url, filename) {
+	try {
+		// const secure = url.slice(0, 4) == 'http' ? http : https;
+		// fs.createWriteStream("file.jpg")
+
+		// .createWriteStream('file.jpg');
+		const data = await axios.get(url, { responseType: 'stream' });
+		const writing = await fsP.writeFile('file.jpg', data);
+		// .then(async(res)=>{
+		// }).then(()=>{
+		// 	console.log("Downloaded File!")
+		// })
+
+		// const request = secure.get(url, function (response) {
+		// 	response.pipe(file);
+
+		// 	file.on('finish', () => {
+		// 		file.close();
+		// 		console.log('Download Completed');
+		// 	});
+		// });
+		return Promise.resolve(writing);
+	} catch (err) {
+		return Promise.reject({ err: 'true', msg: 'GET request failed', errorGiven: err });
+	}
+}
+
+async function downloadThisVideoStream(url,filename) {
+	function one(tasks) {
+		tasks.run().then(()=>console.log("Finished!")).catch(process.exit);
+	}
+
+	if (process.argv) {
+		const tasks = [
+			{
+				title: 'Downloading',
+				task: async () => {
+					if (!fs.existsSync("./media")){
+						fs.mkdirSync("./media");
+					}
+					const filePath = path.resolve(__dirname,"media",filename+".mp4");
+
+					const response = await axios({
+						method: 'GET',
+						url: url,
+						responseType: 'stream',
+					});
+
+					response.data.pipe(fs.createWriteStream(filePath));
+
+					return new Promise((resolve, reject) => {
+						response.data.on('end', () => {
+							resolve();
+						});
+
+						response.data.on('error', err => {
+							reject(err);
+						});
+					});
+				},
+			},
+		];
+
+		one(new Listr(tasks));
+	}
+}
+
+async function getStreamtapeLink(url) {
+	const res = await axios.get(url, {
+		headers: {
+			Origin: 'https://streamtape.com',
+			Referer: 'https://streamtape.com/',
+		},
+	});
+	const $ = load(res.data);
+	let linkAddendum = '&stream=1';
+	const tokenIndex = $('#norobotlink').siblings().text().lastIndexOf('token') + 6;
+	const siblings = $('#norobotlink')
+		.siblings()
+		.text()
+		.slice(tokenIndex, tokenIndex + 12);
+	const finalLink = 'https://' + $('#norobotlink').text().slice(1, -12) + siblings + linkAddendum;
+	return finalLink;
+}
 async function getPage(url, page) {
 	const endResponse = [];
 	try {

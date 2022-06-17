@@ -25,8 +25,11 @@ const InnerModal = ({ setIsModalOpen, modalContent,setFullscreenModalSource,setI
 
   return (
     <div className="InnerModal" onContextMenu={e=>{
-      e.preventDefault()
-      setIsModalOpen(false)
+      if (e.target instanceof HTMLAnchorElement){}else{
+
+        e.preventDefault()
+        setIsModalOpen(false)
+      }
     }}>
       <div className="InnerModal-title">
         {modalContent.pageContent?.title}
