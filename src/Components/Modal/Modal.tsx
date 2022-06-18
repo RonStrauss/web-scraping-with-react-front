@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, useState } from 'react'
-import InnerModal from '../../InnerModal/InnerModal'
+import InnerModal from '../InnerModal/InnerModal'
 import FullscreenModalType from '../../Types/FullscreenModal'
 import ModalContent from '../../Types/ModalContent'
 import FullscreenModal from '../FullscreenModal/FullscreenModal'
