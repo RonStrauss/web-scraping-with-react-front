@@ -3,18 +3,21 @@
     height: 100%;
     width: 100%;
     position: fixed;
-    object-fit: contain;
+    object-fit: cover;
     background-color: rgba(0, 0, 0, 0.926);
     transition: all 0.2s ease-in-out;
-    opacity: 0;
+}
+
+.object-fit-contain{
+    object-fit: contain;
 }
 
 .FullscreenModal-fullscreen{
-    opacity: 1;
+    object-fit: contain;
     width: 100% !important;
     height: 100% !important;
     /* transition: all 0.65s ease; */
-    transition: all 0.5s cubic-bezier(.38,.95,.65,1);
+    transition: all 0.4s cubic-bezier(.38,.95,.65,1);
     top: 0 !important;
     left: 0 !important;
     cursor: pointer;

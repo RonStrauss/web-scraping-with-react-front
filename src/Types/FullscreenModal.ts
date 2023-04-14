@@ -4,4 +4,5 @@ export default interface FullscreenModalType {
     height:number;
     left:number;
     top:number;
+    objectFit:string;
 }

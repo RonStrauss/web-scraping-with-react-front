@@ -8,7 +8,7 @@ type Props = {
     setIsOpen: Dispatch<SetStateAction<boolean>>
 }
 
-const FullscreenModal = ({ FullscreenModalOptions, setIsOpen,isOpen }: Props) => {
+const FullscreenModal = ({ FullscreenModalOptions, setIsOpen, isOpen }: Props) => {
 
     const ref = useRef<HTMLImageElement>(null)
 
@@ -26,7 +26,7 @@ const FullscreenModal = ({ FullscreenModalOptions, setIsOpen,isOpen }: Props) =>
 
 
     return (
-        <img className='FullscreenModal' ref={ref}
+        <img className={`FullscreenModal ${FullscreenModalOptions?.objectFit == "contain" ? "object-fit-contain" : null}`} ref={ref}
             src={FullscreenModalOptions?.img}
             style={{ width: FullscreenModalOptions?.width, height: FullscreenModalOptions?.height, position: "absolute", left: FullscreenModalOptions?.left, top: FullscreenModalOptions?.top }}
             onClick={() => {
@@ -34,7 +34,7 @@ const FullscreenModal = ({ FullscreenModalOptions, setIsOpen,isOpen }: Props) =>
                 setTimeout(() => {
 
                     setIsOpen(false)
-                }, 200)
+                }, 210)
             }
             }
             onContextMenu={e => {

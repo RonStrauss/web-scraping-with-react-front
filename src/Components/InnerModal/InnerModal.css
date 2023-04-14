@@ -3,7 +3,7 @@
     height: 80%;
     background-color: rgba(245, 245, 245, 0.812);
     border-radius: 8px;
-    
+
     display: flex;
     flex-direction: column;
     /* gap: 0.4rem; */
@@ -19,7 +19,6 @@
 .InnerModal-body{
     display: flex;
     height: calc(100% - 1rem);
-    /* height: 100% ; */
 }
 
 .InnerModal-left,.InnerModal-right {
@@ -34,9 +33,16 @@
     justify-content: space-around;
 }
 
+.InnerModal-right-field{
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 0.5rem;
+}
+
 .InnerModal-left{
-    justify-content: space-around;
     width: 70%;
+    gap:1rem;
 }
 
 .InnerModal-left img{
@@ -57,4 +63,5 @@ img.InnerModal-left-top-half-width{
 
 img.InnerModal-left-bottom{
     object-fit: contain;
+    background-color: rgba(0, 0, 0, 0.926);
 }

@@ -4,9 +4,11 @@ import CurrentPage from './Components/CurrentPage/CurrentPage'
 import { Loading } from './Components/Loading/Loading'
 import { Main } from './Components/Main/Main'
 import { Modal } from './Components/Modal/Modal'
+import { Snackbar } from './Components/Snackbar/Snackbar'
 import { Top } from './Components/Top/Top'
 import ModalContent from './Types/ModalContent'
 import ScrappedContent from './Types/ScrappedContent'
+import io from 'socket.io-client';
 
 
 function App() {
@@ -16,11 +18,12 @@ function App() {
   const [isLoading, setIsLoading] = useState(false)
   const [modalContent, setModalContent] = useState<ModalContent>({})
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isSnackbarOpen, setIsSnackbarOpen] = useState(false)
+  const [snackbarMessage, setSnackbarMessage] = useState('Download Started!')
 
 
-  const fetchThisUrl = async (inputtedUrl?: string) => {
-    //typescript doesn't allow both optional and default arguments in function declarations
-    if (!inputtedUrl) inputtedUrl = url
+
+  const fetchThisUrl = async (inputtedUrl: string = url) => {
     try {
       setIsLoading(true)
       const res = await fetch(`http://localhost:1000/scrape-page?url=${inputtedUrl}${count > 1 ? "&page=" + count : ''}`)
@@ -53,17 +56,52 @@ function App() {
     }
   }, [isModalOpen])
 
+  const openSnackbarWithMessage = (val: string) => {
+    setSnackbarMessage(val)
+    setIsSnackbarOpen(true)
+    setTimeout(() => { setIsSnackbarOpen(false) }, 4000)
+  }
+
+  useEffect(() => {
+    const socket = io('http://localhost:1000')
+    socket.on('connect', () => {
+      console.log('connected');
+    });
+    socket.on('started', (val: string) => {
+      setSnackbarMessage(val)
+      setIsSnackbarOpen(true)
+      setTimeout(() => { setIsSnackbarOpen(false) }, 4000)
+      console.log('started');
+    });
+
+    socket.on('finished', (val: string) => {
+      openSnackbarWithMessage(val)
+    });
+
+    socket.on('error', (val: string) => {
+      openSnackbarWithMessage(val)
+    })
+
+    return () => {
+      socket.off('started');
+      socket.off('finished');
+      socket.off('error');
+      socket.off('connect');
+    };
+  }, []);
+
 
 
 
 
   return (
     <div className="App">
-      <Top {...{ url, setUrl, fetchThisUrl,count, setCount }} />
-      {count > 1 ? <CurrentPage {...{count}}/> : null}
-      <Main {...{ count, links, fetchThisUrl,url, setCount, setModalContent, setIsModalOpen, setIsLoading }} />
+      <Top {...{ url, setUrl, fetchThisUrl, count, setCount }} />
+      {count > 1 ? <CurrentPage {...{ count }} /> : null}
+      <Main {...{ count, links, fetchThisUrl, url, setCount, setModalContent, setIsModalOpen, setIsLoading }} />
       {isLoading ? <Loading /> : null}
       {isModalOpen ? <Modal {...{ ...{ modalContent }, setIsModalOpen }} /> : null}
+      <Snackbar {...{ isSnackbarOpen, setIsSnackbarOpen, snackbarMessage, setSnackbarMessage }} />
     </div>
   )
 }

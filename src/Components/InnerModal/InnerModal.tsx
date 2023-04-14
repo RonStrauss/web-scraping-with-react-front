@@ -18,15 +18,13 @@ const InnerModal = ({ setIsModalOpen, modalContent,setFullscreenModalSource,setI
       width,
       height,
       left,
-      top})
+      top,
+    objectFit: element.classList.contains("InnerModal-left-bottom") ? "contain":"cover"})
     setIsFullscreenModalOpen(true)
   }
 
   const downloadWithServer = async (url:string, filename:string="video.mp4",site:string):Promise<void> =>{
     const res = await fetch(`http://localhost:1000/download-from-this-link?${new URLSearchParams({url,filename:filename+".mp4",site})}`)
-    const data = await res.json()
-
-    alert(data.msg)
   }
 
 
@@ -53,7 +51,9 @@ const InnerModal = ({ setIsModalOpen, modalContent,setFullscreenModalSource,setI
         </div>
         <div className="InnerModal-right">
           <div className="InnerModal-right-field"><a href={modalContent.pageContent?.link} target="_blank">Original Page</a></div>
-          {modalContent.streamtape ? <div className="InnerModal-right-field"><button onClick={()=>{downloadWithServer(modalContent.streamtape?.url||"typescript is silly",modalContent.pageContent?.title,"streamtape")}}>Download Streamtape Video</button></div>:null}
+          {modalContent.streamtape ? <div className="InnerModal-right-field"><div className="streamtape"></div><button onClick={()=>{downloadWithServer(modalContent.streamtape?.url||"typescript is silly",modalContent.pageContent?.title,"streamtape")}}>Download Streamtape Video To Server</button>
+          <a href={`http://localhost:1000/scrape-streamtape?url=${modalContent.streamtape.url}`} target="_blank">Open Video In New Tab</a>
+          </div>:null}
           {modalContent.vidoza ? <div className="InnerModal-right-field"><a href={modalContent.vidoza.video} target="_blank">Vidoza Video</a></div>:null}
         </div>
       </div>
