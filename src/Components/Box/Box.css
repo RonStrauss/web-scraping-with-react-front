@@ -16,7 +16,7 @@
 }
 
 .Box-title {
-    box-shadow: inset 0 0 10px 9px #fff;
+    box-shadow: inset 0 0 10px 9px var(--bg-color);
     padding: 0.1rem;
     transition: all 200ms ease;
 }
@@ -27,4 +27,9 @@
 
 .Box:hover .Box-title:hover {
     opacity: 1;
+}
+
+@media (prefers-color-scheme:dark) {
+
+
 }

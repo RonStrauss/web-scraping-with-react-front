@@ -1,5 +1,50 @@
+:root {
+  --bg-color: #fff;
+  --bg-color-alpha: #ffffffc7;
+}
+
 .App {
   height: 100%;
   width: 100%;
   position: relative;
+}
+
+@media (prefers-color-scheme: dark) {
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 30px #383030ba inset;
+  }
+
+  :root {
+    --bg-color: #545454;
+    --bg-color-alpha: #545454c7;
+  }
+
+  * {
+    scrollbar-color: #454a4d #202324;
+  }
+
+  .App {
+    background-color: black;
+    color: white;
+  }
+
+  a{
+    color:white;
+  }
+
+  a:visited{
+    color:rgba(255, 131, 255, 0.918);
+  }
+
+  input,
+  select,
+  button {
+    background: #181a1b;
+    color: white;
+    border-color: #736b5e;
+  }
 }

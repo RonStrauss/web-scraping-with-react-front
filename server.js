@@ -1,3 +1,5 @@
+/** @format */
+
 const { load } = require('cheerio');
 const express = require('express');
 const axios = require('axios').default;
@@ -7,6 +9,7 @@ const http = require('node:http');
 const app = express();
 const server = http.createServer(app);
 const socketIo = require('socket.io');
+const { v4 } = require('uuid');
 const io = socketIo(server, {
 	cors: {
 		origin: '*',
@@ -16,6 +19,10 @@ const io = socketIo(server, {
 const fsP = require('fs/promises');
 const fs = require('fs');
 const { default: getTezfilesLink } = require('./Tests/getTezfilesLink');
+
+require('dotenv').config();
+
+const PORT = process.env.VITE_SERVER_PORT || 1000;
 
 app.use(require('cors')());
 
@@ -55,7 +62,10 @@ app.get('/download-from-this-link', async (req, res) => {
 		}
 	} catch (err) {
 		console.log(err);
-		res.status(500).send({ err: true, msg: `Whoops! That shouldn't have happened...` });
+		res.status(500).send({
+			err: true,
+			msg: `Whoops! That shouldn't have happened...`,
+		});
 	}
 });
 
@@ -66,7 +76,10 @@ app.get('/scrape-streamtape', async (req, res) => {
 		res.redirect(url);
 	} catch (err) {
 		console.log(err);
-		res.status(500).send({ err: true, msg: `Whoops! That shouldn't have happened...` });
+		res.status(500).send({
+			err: true,
+			msg: `Whoops! That shouldn't have happened...`,
+		});
 	}
 });
 
@@ -98,8 +111,8 @@ app.get('/download', function (req, res) {
 
 // async function getVideo() {}
 
-server.listen(1000, () => {
-	console.log('running 1000\nhttp://localhost:1000');
+server.listen(PORT, () => {
+	console.log(`running ${PORT}\nhttp://localhost:${PORT}`);
 });
 
 const searchInString = (string, key) => string.search(key);
@@ -161,18 +174,32 @@ async function getStreamtapeLink(url) {
 async function getPage(url, page) {
 	const endResponse = [];
 	try {
+		const isSearchQuery = url.includes('s=');
 		url = url[-1] == '/' ? url.slice(0, url.length - 2) : url;
 		const res = await axios.get(page ? `${url}/page/${page}` : url);
 		const $ = load(res.data);
 		$('article').each((i, data) => {
-			//skip if first article in first page
-			// if (!i && !page) {
-			// } else {
-				endResponse.push({
+
+			let obj = {};
+
+			if (!isSearchQuery){
+
+
+				obj = {
 					title: $(data.children[1].childNodes[3]).text(),
 					link: data.children[1].childNodes[3].children[0].attribs.href,
 					img: data?.children?.[4]?.children?.[1]?.children?.[0]?.attribs?.src,
-				});
+					id: v4(),
+				};
+			} else {
+				obj = {
+					title: $(data.children[1].childNodes[4]).text(),
+					link: data.children[1].childNodes[4].attribs.href,
+					img: data.children[4].children[1].children[0].attribs.src,
+					id: v4(),
+				};
+			}
+			endResponse.push(obj);
 			// }
 		});
 		return endResponse;
@@ -195,7 +222,10 @@ async function getSingle(url) {
 			const link = res.data.slice(searchStreamtape, searchStreamtape + searchLinkLength);
 			const streamtapeRes = await axios.get(link);
 			const $ = load(streamtapeRes.data);
-			endResponse.streamtape = { img: $('#mainvideo').attr().poster, url: link };
+			endResponse.streamtape = {
+				img: $('#mainvideo').attr().poster,
+				url: link,
+			};
 		}
 		if (searchVidoza > -1) {
 			const link = res.data.slice(searchVidoza, searchVidoza + 36);
@@ -203,7 +233,9 @@ async function getSingle(url) {
 			setTimeout(() => {
 				controller.abort();
 			}, 10000);
-			const searchVidozaRes = await axios.get(link, { signal: controller.signal });
+			const searchVidozaRes = await axios.get(link, {
+				signal: controller.signal,
+			});
 			const $ = load(searchVidozaRes.data);
 			endResponse.vidoza = { video: $('#player>source').attr('src') };
 			const searchPoster = searchInString(searchVidozaRes.data, 'poster:');

@@ -10,6 +10,10 @@ import ModalContent from './Types/ModalContent'
 import ScrappedContent from './Types/ScrappedContent'
 import io from 'socket.io-client';
 
+export const PORT = import.meta.env.VITE_SERVER_PORT || 1000
+export const protocol = JSON.parse(import.meta.env.VITE_isSSL) ? 'https' : 'http'
+export const domain = import.meta.env.VITE_DOMAIN || 'localhost'
+export const API = `${protocol}://${domain}:${PORT}`
 
 function App() {
   const [count, setCount] = useState(1)
@@ -20,17 +24,25 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [isSnackbarOpen, setIsSnackbarOpen] = useState(false)
   const [snackbarMessage, setSnackbarMessage] = useState('Download Started!')
+  const [toKeep, setToKeep] = useState(30)
 
 
 
   const fetchThisUrl = async (inputtedUrl: string = url) => {
     try {
+      if (!inputtedUrl) {
+        alert('Please enter a valid url!')
+        return;
+      }
       setIsLoading(true)
-      const res = await fetch(`http://localhost:1000/scrape-page?url=${inputtedUrl}${count > 1 ? "&page=" + count : ''}`)
+      const res = await fetch(`${API}/scrape-page?url=${inputtedUrl}${count > 1 ? "&page=" + count : ''}`)
       const data = await res.json()
       if (!data.err) {
         setCount(count + 1)
-        setLinks([...links, ...data])
+        setLinks([...links.slice(Math.max(links.length - toKeep, 0), links.length), ...data])
+        window.scrollTo(0, window.scrollY)
+
+        // setLinks([...links, ...data])
         setIsLoading(false)
       } else {
         alert(data.msg + "\n" + data.err)
@@ -63,7 +75,7 @@ function App() {
   }
 
   useEffect(() => {
-    const socket = io('http://localhost:1000')
+    const socket = io(API)
     socket.on('connect', () => {
       console.log('connected');
     });
@@ -96,7 +108,7 @@ function App() {
 
   return (
     <div className="App">
-      <Top {...{ url, setUrl, fetchThisUrl, count, setCount }} />
+      <Top {...{ url, setUrl, fetchThisUrl, count, setCount, toKeep,setToKeep }} />
       {count > 1 ? <CurrentPage {...{ count }} /> : null}
       <Main {...{ count, links, fetchThisUrl, url, setCount, setModalContent, setIsModalOpen, setIsLoading }} />
       {isLoading ? <Loading /> : null}

@@ -2,6 +2,7 @@ import './Box.css';
 import ScrappedContent from '../../Types/ScrappedContent';
 import { Dispatch, SetStateAction, } from 'react';
 import ModalContent from '../../Types/ModalContent';
+import { API } from '../../App';
 
 interface Props extends ScrappedContent {
   setModalContent: Dispatch<SetStateAction<ModalContent>>
@@ -14,7 +15,7 @@ const Box = ({ link, title, img, setIsLoading, setIsModalOpen, setModalContent, 
 
   const fetchRelatedLinks = async (url: string) => {
     setIsLoading(true)
-    const res = await fetch(`http://localhost:1000/scrape-single?url=${url}`)
+    const res = await fetch(`${API}/scrape-single?url=${url}`)
     const data = await res.json()
     if (!data.err) {
       setIsModalOpen(true)

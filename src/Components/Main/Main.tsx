@@ -4,6 +4,7 @@ import ScrappedContent from '../../Types/ScrappedContent'
 import Box from '../Box/Box'
 import "./Main.css"
 
+
 type Props = {
   count: number;
   setCount: Dispatch<SetStateAction<number>>
@@ -14,15 +15,15 @@ type Props = {
   url: string
   fetchThisUrl: (url?: string) => Promise<void>
 }
+export const rowRenderer  = () =>{}
+
+
 
 export const Main = ({ count, url, setCount, setModalContent, setIsModalOpen, setIsLoading, links, fetchThisUrl }: Props) => {
 
   const triggerSmoothScroll = () => {
     window.scroll({ top: window.scrollY + 300, behavior: 'smooth' })
   }
-
-
-
 
   const containerRef = useRef(null)
 
@@ -41,6 +42,7 @@ export const Main = ({ count, url, setCount, setModalContent, setIsModalOpen, se
 
   return (
     <div className='Main'>
-      <div className="scrollTrigger" onClick={triggerSmoothScroll} onContextMenu={e => { e.preventDefault(); triggerSmoothScroll() }}>Scroll Area</div>{links.map((each: ScrappedContent) => <Box {...{ ...each,setModalContent, setIsModalOpen, setIsLoading }} />)}<span id="observer" ref={containerRef}></span></div>
+      <div className="scrollTrigger" onClick={triggerSmoothScroll} onContextMenu={e => { e.preventDefault(); triggerSmoothScroll() }}>Scroll Area</div>{links.map((each: ScrappedContent) => <Box {...{ ...each,setModalContent, setIsModalOpen, setIsLoading }} key={each.id} />)}<span id="observer" ref={containerRef}></span></div>
   )
 }
+

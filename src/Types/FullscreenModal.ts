@@ -1,8 +1,8 @@
 export default interface FullscreenModalType {
-    img:string;
-    width:number;
-    height:number;
-    left:number;
-    top:number;
-    objectFit:string;
+	img: string;
+	width: number;
+	height: number;
+	left: number;
+	top: number;
+	objectFit: 'contain' | 'cover';
 }

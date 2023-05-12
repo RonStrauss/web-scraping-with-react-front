@@ -12,7 +12,8 @@
     justify-content: center;
 }
 
-.Top-form-field>input {
+.Top-form-field>input,
+.Top-form-field>select {
     width: 75%;
 }
 
